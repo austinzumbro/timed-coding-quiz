@@ -56,7 +56,7 @@ header {
 }
 
 #main-section {
-	display: flex;
+	display: grid;
 	justify-content: center;
 	align-items: center;
 	min-height: 400px;

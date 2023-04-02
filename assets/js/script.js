@@ -33,44 +33,64 @@ highScoresLink.setAttribute('href', 'highscores.html');
 highScoresLink.innerHTML = 'High Scores';
 
 // Quiz variables
-const quizQuestions = {
-	q1: {
+const quizQuestionsStaticLibrary = [
+	{
 		question: 'The answer to this question is A.',
-		answers: {
-			correct: 'A',
-			wrong1: 'B',
-			wrong2: 'C',
-			wrong3: 'D',
-		},
+		answers: [
+			{ text: 'A', correct: true },
+			{ text: 'B', correct: false },
+			{ text: 'C', correct: false },
+			{ text: 'D', correct: false },
+		],
 	},
-	q2: {
+	{
 		question: 'The answer to this question is B.',
-		answers: {
-			correct: 'B',
-			wrong1: 'C',
-			wrong2: 'D',
-			wrong3: 'A',
-		},
+		answers: [
+			{ text: 'A', correct: false },
+			{ text: 'B', correct: true },
+			{ text: 'C', correct: false },
+			{ text: 'D', correct: false },
+		],
 	},
-	q3: {
+	{
 		question: 'The answer to this question is C.',
-		answers: {
-			correct: 'C',
-			wrong1: 'D',
-			wrong2: 'A',
-			wrong3: 'B',
-		},
+		answers: [
+			{ text: 'A', correct: false },
+			{ text: 'B', correct: false },
+			{ text: 'C', correct: true },
+			{ text: 'D', correct: false },
+		],
 	},
-	q4: {
+	{
 		question: 'The answer to this question is D.',
-		answers: {
-			correct: 'D',
-			wrong1: 'A',
-			wrong2: 'B',
-			wrong3: 'C',
-		},
+		answers: [
+			{ text: 'A', correct: false },
+			{ text: 'B', correct: false },
+			{ text: 'C', correct: false },
+			{ text: 'D', correct: true },
+		],
 	},
-};
+];
+
+let quizQuestionsDynamicLibrary = [];
+let quizPosition = 0;
+
+function randomizeArray(questionArr) {
+	let sourceArray = questionArr;
+	let returnArray = [];
+
+	while (sourceArray.length > 0) {
+		let randomIndex = Math.floor(Math.random() * sourceArray.length);
+		returnArray.push(sourceArray[randomIndex]);
+		sourceArray.splice(randomIndex, 1);
+	}
+	return returnArray;
+}
+
+quizQuestionsDynamicLibrary = randomizeArray(quizQuestionsStaticLibrary);
+console.log(quizQuestionsDynamicLibrary);
+
+// Assemble the page elements
 
 function buildTheHeader() {
 	header.appendChild(highScoresLink);
@@ -83,10 +103,9 @@ function buildMainSection() {
 }
 
 function init() {
-	console.log(body);
 	buildTheHeader();
-	body.appendChild(header);
 	buildMainSection();
+	body.appendChild(header);
 	body.appendChild(mainSection);
 }
 
@@ -94,6 +113,31 @@ startButton.addEventListener('click', startQuiz);
 
 function startQuiz() {
 	startButton.setAttribute('class', 'hidden');
+	let questionDiv = displayQuestion(quizPosition);
+	mainSection.appendChild(questionDiv);
+}
+
+function displayQuestion(index) {
+	let questionDiv = document.createElement('div');
+	questionDiv.setAttribute('class', 'question-container');
+
+	let questionText = quizQuestionsDynamicLibrary[index].question;
+	let questionH2 = document.createElement('h2');
+	questionH2.innerHTML = questionText;
+
+	let answerSection = document.createElement('ul');
+	let answerList = randomizeArray(quizQuestionsDynamicLibrary[index].answers);
+	for (let i = 0; i < answerList.length; i++) {
+		let answerLi = document.createElement('li');
+		answerLi.innerHTML = answerList[i].text;
+		answerLi.setAttribute('data-correct', answerList[i].correct);
+		answerSection.appendChild(answerLi);
+	}
+
+	questionDiv.appendChild(questionH2);
+	questionDiv.appendChild(answerSection);
+
+	return questionDiv;
 }
 
 init();
