@@ -62,7 +62,8 @@ const quizOverFormSubmit = document.createElement('input');
 quizOverFormSubmit.setAttribute('type', 'submit');
 
 const footer = document.createElement('footer');
-footer.innerHTML = '<h2>This is here to check spacing and layout.</h2>';
+const resetButton = document.createElement('button');
+resetButton.setAttribute('id', 'reset-button');
 
 let quizQuestionsDynamicLibrary = [];
 let quizPosition = 0;
@@ -123,28 +124,8 @@ function randomizeArray(questionArr) {
 	return returnArray;
 }
 
+// Build a randomized library of questions
 quizQuestionsDynamicLibrary = randomizeArray(quizQuestionsStaticLibrary);
-
-// Assemble the page elements
-function buildTheHeader() {
-	header.appendChild(highScoresLink);
-	header.appendChild(pageTitle);
-	header.appendChild(timerDiv);
-}
-
-function buildMainSection() {
-	mainSection.appendChild(startButton);
-	mainSection.appendChild(questionSection);
-	mainSectionGrid.append(mainSection);
-}
-
-function buildScoreForm() {
-	quizOverForm.appendChild(quizOverFormText);
-	quizOverForm.appendChild(quizOverFormLabel);
-	quizOverForm.appendChild(quizOverFormInitials);
-	quizOverForm.appendChild(quizOverFormSubmit);
-	quizOverSection.appendChild(quizOverForm);
-}
 
 function displayScore() {
 	quizOverH2.innerHTML = 'Quiz Complete!';
@@ -159,16 +140,6 @@ function displayScore() {
 	buildScoreForm();
 	mainSection.appendChild(quizOverSection);
 }
-
-function init() {
-	buildTheHeader();
-	buildMainSection();
-	body.appendChild(header);
-	body.appendChild(mainSectionGrid);
-	body.appendChild(footer);
-}
-
-startButton.addEventListener('click', startQuiz);
 
 function startTimer() {
 	let timerSpanEl = document.getElementById('timer-span');
@@ -263,6 +234,70 @@ mainSection.addEventListener('click', function (event) {
 		mainSection.appendChild(answerResponse);
 		const timeout1 = setTimeout(advanceQuestion, 200);
 	}
+});
+
+startButton.addEventListener('click', startQuiz);
+
+quizOverFormSubmit.addEventListener('click', function (event) {
+	event.preventDefault();
+	let userScore = [
+		{
+			initials: quizOverFormInitials.value.trim(),
+			score: startingTime,
+		},
+	];
+
+	let scoreArchive = localStorage.getItem('userScores');
+
+	if (scoreArchive === null) {
+		console.log('If condition fires.');
+		localStorage.setItem('userScores', JSON.stringify(userScore));
+	} else {
+		console.log('Else condition fires.');
+		let scoreArray = JSON.parse(scoreArchive);
+		scoreArray.push(userScore[0]);
+
+		localStorage.setItem('userScores', JSON.stringify(scoreArray));
+	}
+	mainSection.lastChild.remove();
+});
+
+// Assemble the page elements
+function buildHeader() {
+	header.appendChild(highScoresLink);
+	header.appendChild(pageTitle);
+	header.appendChild(timerDiv);
+}
+
+function buildFooter() {
+	footer.appendChild(resetButton);
+}
+
+function buildMainSection() {
+	mainSection.appendChild(startButton);
+	mainSection.appendChild(questionSection);
+	mainSectionGrid.append(mainSection);
+}
+
+function buildScoreForm() {
+	quizOverForm.appendChild(quizOverFormText);
+	quizOverForm.appendChild(quizOverFormLabel);
+	quizOverForm.appendChild(quizOverFormInitials);
+	quizOverForm.appendChild(quizOverFormSubmit);
+	quizOverSection.appendChild(quizOverForm);
+}
+
+function init() {
+	buildHeader();
+	buildMainSection();
+	buildFooter();
+	body.appendChild(header);
+	body.appendChild(mainSectionGrid);
+	body.appendChild(footer);
+}
+
+resetButton.addEventListener('click', function () {
+	localStorage.clear();
 });
 
 init();
