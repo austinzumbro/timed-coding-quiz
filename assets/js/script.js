@@ -69,52 +69,72 @@ let startingTime = 60;
 let timerInterval;
 
 // Quiz variables
+// Set up a library object that stores quiz questions
+// In a larger application, it would make sense to store these elsewhere
+// and build the object using a function.
 const quizQuestionsStaticLibrary = [
   {
-    question: "The answer to this question is A.",
+    question: 'What is the difference between "==" and "==="?',
     answers: [
-      { text: "A", correct: true },
-      { text: "B", correct: false },
-      { text: "C", correct: false },
-      { text: "D", correct: false },
+      {
+        text: '"==" checks equality in value, whereas "===" checks equality in value and type.',
+        correct: true,
+      },
+      {
+        text: "Nothing. Both are comparison operators that check equality.",
+        correct: false,
+      },
+      {
+        text: '"==" checks whether two values are equal, whereas "===" checks whether two values are not equal.',
+        correct: false,
+      },
+      {
+        text: '"==" checks equality in value, whereas "===" is not a valid comparison operator.',
+        correct: false,
+      },
     ],
   },
   {
-    question: "The answer to this question is B.",
+    question: 'Which of the following is a "falsy" value?',
     answers: [
-      { text: "A", correct: false },
-      { text: "B", correct: true },
-      { text: "C", correct: false },
-      { text: "D", correct: false },
+      { text: "object", correct: false },
+      { text: "NaN", correct: true },
+      { text: "[]", correct: false },
+      { text: "-1", correct: false },
     ],
   },
   {
-    question: "The answer to this question is C.",
+    question: 'Which of the following is a "truthy" value?',
     answers: [
-      { text: "A", correct: false },
-      { text: "B", correct: false },
-      { text: "C", correct: true },
-      { text: "D", correct: false },
+      { text: "NaN", correct: false },
+      { text: "null", correct: false },
+      { text: '"false"', correct: true },
+      { text: "0", correct: false },
     ],
   },
   {
-    question: "The answer to this question is D.",
+    question: 'let x = "string"; What value does x[3] return?',
     answers: [
-      { text: "A", correct: false },
-      { text: "B", correct: false },
-      { text: "C", correct: false },
-      { text: "D", correct: true },
+      { text: "r", correct: false },
+      { text: "Error", correct: false },
+      { text: "undefined", correct: false },
+      { text: "i", correct: true },
     ],
   },
 ];
 
+// Helper function to randomize arrays
 function randomizeArray(questionArr) {
   let sourceArray = [];
   let returnArray = [];
+
+  // Clone the array into a new array
+  // I couldn't find an out-of-the-box method for doing this... Seems odd.
   for (let i = 0; i < questionArr.length; i++) {
     sourceArray.push(questionArr[i]);
   }
 
+  // Pull a random element out of one array and feed it to the other
   while (sourceArray.length > 0) {
     let randomIndex = Math.floor(Math.random() * sourceArray.length);
     returnArray.push(sourceArray[randomIndex]);
@@ -123,6 +143,7 @@ function randomizeArray(questionArr) {
   return returnArray;
 }
 
+// At the end of the quiz, show the user their score
 function displayScore() {
   quizOverH2.innerHTML = "Quiz Complete!";
   quizOverSection.appendChild(quizOverH2);
@@ -137,6 +158,7 @@ function displayScore() {
   mainSection.appendChild(quizOverSection);
 }
 
+// Start the timer
 function startTimer() {
   let timerSpanEl = document.getElementById("timer-span");
   timerInterval = setInterval(function () {
@@ -148,11 +170,13 @@ function startTimer() {
   }, 1000);
 }
 
+// Start the quiz
 function startQuiz() {
   // Build a randomized library of questions
   quizQuestionsDynamicLibrary = randomizeArray(quizQuestionsStaticLibrary);
 
   // Clear the Main Section
+  // Relevant in cases where the user restarts the quiz
   while (mainSection.firstChild) {
     mainSection.firstChild.remove();
   }
@@ -170,10 +194,10 @@ function startQuiz() {
 
 // Builds a question in HTML
 // References the randomized quizQuestionDynamicLibrary
-// Pull in the question text and appends it as an <h2>
+// Pulls in the question text and appends it as an <h2>
 // Randomizes the answers of that question
 // Builds an unordered list of those answers and appends it
-// Returns the entire question as a div element for display on the page.
+// Appends the entire question wrapped in a div element.
 
 function displayQuestion(index) {
   // Clear the currently displayed question, if applicable
@@ -205,6 +229,8 @@ function displayQuestion(index) {
   questionSection.appendChild(questionDiv);
 }
 
+// Move on to the next question
+// If no more questions remain, stop the quiz
 function advanceQuestion() {
   quizPosition++;
   if (quizQuestionsDynamicLibrary[quizPosition]) {
@@ -214,9 +240,11 @@ function advanceQuestion() {
   }
 }
 
+// Stop the timer
 function stopQuiz() {
   clearInterval(timerInterval);
-  quizPosition = 0;
+
+  // Clear out the Main Section to make space for the score
   while (mainSection.firstChild) {
     mainSection.firstChild.remove();
   }
@@ -224,25 +252,37 @@ function stopQuiz() {
   displayScore();
 }
 
+// Let the user click to choose an answer
 mainSection.addEventListener("click", function (event) {
   let element = event.target;
+
   if (element.dataset.correct == "true") {
+    // Behavior if the answer is correct
+    // Change the color of the element to give instant feedback
     element.setAttribute("style", "background: lightblue");
     answerResponseH2.innerHTML = "Correct!";
     mainSection.appendChild(answerResponse);
     let removal = document.getElementById("answer-response");
+
+    // Delay question advancement so user can see the color
     const timeout1 = setTimeout(advanceQuestion, 200);
   } else if (element.dataset.correct == "false") {
+    // Behavior if the answer is wrong
+    // Change the color of the element to give instant feedback
     element.setAttribute("class", "wrong");
     answerResponseH2.innerHTML = "Wrong!";
     startingTime -= 15;
     mainSection.appendChild(answerResponse);
+
+    // Delay question advancement so user can see the color
     const timeout1 = setTimeout(advanceQuestion, 200);
   }
 });
 
+// When the user clicks the start button, start the quiz.
 startButton.addEventListener("click", startQuiz);
 
+// Allow the user to save their score to localStorage
 quizOverFormSubmit.addEventListener("click", function (event) {
   event.preventDefault();
   let userScore = [
@@ -272,11 +312,15 @@ function buildHeader() {
   header.appendChild(timerDiv);
 }
 
-function buildFooter() {}
-
 function buildMainSection() {
   mainSection.appendChild(startButton);
   mainSectionGrid.append(mainSection);
+}
+
+function buildFooter() {
+  // This used to include a reset score button, but that's been moved
+  // to the High Scores page.  This function has been left here for
+  // potential use in the future.
 }
 
 function buildScoreForm() {
