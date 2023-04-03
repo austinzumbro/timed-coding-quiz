@@ -23,6 +23,11 @@ h1 {
 	text-shadow: 6px 6px #ababab;
 }
 
+h2 {
+	font-weight: 700;
+	font-size: 1.2em;
+}
+
 .question {
 	font-family: 'Lora', serif;
 }
@@ -35,6 +40,20 @@ header {
 	align-items: center;
 	align-content: center;
 	padding: 40px 8px;
+}
+
+footer {
+	background: green;
+	position: absolute;
+	bottom: 0px;
+	min-height: 40px;
+	width: 100%;
+	text-align: center;
+}
+
+footer h2 {
+	color: white;
+	padding: 20px;
 }
 
 .timer {
@@ -55,11 +74,40 @@ header {
 	font-size: 2.5em;
 }
 
-#main-section {
+#main-section-grid {
 	display: grid;
-	justify-content: center;
-	align-items: center;
+	grid-template-columns: 10% auto 10%;
+	grid-template-rows: 10% auto 10%;
+	width: 100%;
+	justify-items: center;
+}
+
+#main-section {
+	grid-column: 2 / 3;
+	grid-row: 2 / 3;
+
 	min-height: 400px;
+}
+
+#current-question h2 {
+	background: green;
+	color: white;
+	padding: 20px 40px;
+}
+
+#current-question li {
+	background: lightgrey;
+	padding: 20px;
+	margin: 12px 0px;
+	border-radius: 8px;
+}
+
+#current-question li.correct {
+	background: lightblue;
+}
+
+#current-question li.wrong {
+	background: orange;
 }
 
 #start-button {
@@ -70,6 +118,33 @@ header {
 	padding: 40px;
 }
 
-.hidden {
-	display: none;
+#quiz-over {
+	padding: 30px;
+}
+
+#quiz-over h2 {
+	font-size: 2em;
+	margin-bottom: 20px;
+}
+
+#quiz-over > p {
+	margin-bottom: 30px;
+	font-size: 1.8em;
+	text-align: center;
+}
+
+#quiz-over form p {
+	margin-bottom: 12px;
+}
+
+#quiz-over form input[type='text'] {
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	margin: 20px;
+	height: 20px;
+	font-size: 24px;
+	background: lightgreen;
+	padding: 24px;
+	width: 100px;
 }

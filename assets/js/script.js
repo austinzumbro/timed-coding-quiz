@@ -1,41 +1,75 @@
 // Page elements
 const body = document.body;
 const header = document.createElement('header');
-const pageTitle = document.createElement('h1');
-const highScoresLink = document.createElement('a');
-const timer = document.createElement('div');
+header.setAttribute('class', 'header');
 
+const pageTitle = document.createElement('h1');
+pageTitle.setAttribute('class', 'title');
+pageTitle.innerHTML = 'Coding Quiz';
+
+const highScoresLink = document.createElement('a');
+highScoresLink.setAttribute('href', 'highscores.html');
+highScoresLink.innerHTML = 'High Scores';
+
+const timerDiv = document.createElement('div');
+timerDiv.setAttribute('class', 'timer');
+const timerH2 = document.createElement('h2');
+timerH2.setAttribute('class', 'timer-heading');
+timerH2.innerHTML = 'Score';
+const timerBr = document.createElement('br');
+const timerSpan = document.createElement('span');
+timerSpan.innerHTML = '__';
+timerSpan.setAttribute('id', 'timer-span');
+timerDiv.appendChild(timerH2);
+timerDiv.appendChild(timerBr);
+timerDiv.appendChild(timerSpan);
+
+const mainSectionGrid = document.createElement('section');
+mainSectionGrid.setAttribute('id', 'main-section-grid');
 const mainSection = document.createElement('section');
+mainSection.setAttribute('id', 'main-section');
+
 const startButton = document.createElement('button');
+startButton.setAttribute('id', 'start-button');
+startButton.textContent = 'Press to Start';
+
 const questionSection = document.createElement('section');
+questionSection.setAttribute('id', 'question-section');
+
 const answerResponse = document.createElement('div');
+answerResponse.setAttribute('id', 'answer-response');
 answerResponse.appendChild(document.createElement('hr'));
 const answerResponseH2 = document.createElement('h2');
 answerResponse.appendChild(answerResponseH2);
 
+const quizOverSection = document.createElement('section');
+quizOverSection.setAttribute('id', 'quiz-over');
+const quizOverH2 = document.createElement('h2');
+const quizOverP = document.createElement('p');
+
+const quizOverForm = document.createElement('form');
+quizOverForm.setAttribute('id', 'quiz-over-form');
+const quizOverFormText = document.createElement('p');
+quizOverFormText.innerHTML = 'Submit your initials to save your score.';
+const quizOverFormLabel = document.createElement('label');
+quizOverFormLabel.setAttribute('for', 'initials');
+quizOverFormLabel.innerHTML = 'Initials';
+const quizOverFormInitials = document.createElement('input');
+quizOverFormInitials.setAttribute('type', 'text');
+quizOverFormInitials.setAttribute('id', 'initials');
+quizOverFormInitials.setAttribute('name', 'initials');
+const quizOverFormSubmit = document.createElement('input');
+quizOverFormSubmit.setAttribute('type', 'submit');
+
 const footer = document.createElement('footer');
 footer.innerHTML = '<h2>This is here to check spacing and layout.</h2>';
 
-// Set multiple attributes at once
-function setAttributes(element, attributes) {
-	for (let i = 0; i < attrs.length; i++) {
-		element.setAttribute(attributes[i]);
-	}
-}
+let quizQuestionsDynamicLibrary = [];
+let quizPosition = 0;
+let startingTime = 60;
+let timerInterval;
 
 // Assign attributes to Page Elements
-header.setAttribute('class', 'header');
-pageTitle.setAttribute('class', 'title');
-pageTitle.innerHTML = 'Coding Quiz';
-timer.setAttribute('class', 'timer');
-timer.innerHTML = '<h2 class="timer-heading">Time</h2><br><span>_:__</span>';
-highScoresLink.setAttribute('href', 'highscores.html');
-highScoresLink.innerHTML = 'High Scores';
-
-mainSection.setAttribute('id', 'main-section');
-startButton.setAttribute('id', 'start-button');
-startButton.textContent = 'Press to Start';
-questionSection.setAttribute('id', 'question-section');
 
 // Quiz variables
 const quizQuestionsStaticLibrary = [
@@ -77,9 +111,6 @@ const quizQuestionsStaticLibrary = [
 	},
 ];
 
-let quizQuestionsDynamicLibrary = [];
-let quizPosition = 0;
-
 function randomizeArray(questionArr) {
 	let sourceArray = questionArr;
 	let returnArray = [];
@@ -93,34 +124,69 @@ function randomizeArray(questionArr) {
 }
 
 quizQuestionsDynamicLibrary = randomizeArray(quizQuestionsStaticLibrary);
-console.log(quizQuestionsDynamicLibrary);
 
 // Assemble the page elements
-
 function buildTheHeader() {
 	header.appendChild(highScoresLink);
 	header.appendChild(pageTitle);
-	header.appendChild(timer);
+	header.appendChild(timerDiv);
 }
 
 function buildMainSection() {
 	mainSection.appendChild(startButton);
 	mainSection.appendChild(questionSection);
+	mainSectionGrid.append(mainSection);
+}
+
+function buildScoreForm() {
+	quizOverForm.appendChild(quizOverFormText);
+	quizOverForm.appendChild(quizOverFormLabel);
+	quizOverForm.appendChild(quizOverFormInitials);
+	quizOverForm.appendChild(quizOverFormSubmit);
+	quizOverSection.appendChild(quizOverForm);
+}
+
+function displayScore() {
+	quizOverH2.innerHTML = 'Quiz Complete!';
+	quizOverSection.appendChild(quizOverH2);
+	if (startingTime <= 0) {
+		quizOverP.innerHTML =
+			'Your score is ' + startingTime + '. Study up and try again.';
+	} else {
+		quizOverP.innerHTML = 'Your score is ' + startingTime + '.';
+	}
+	quizOverSection.appendChild(quizOverP);
+	buildScoreForm();
+	mainSection.appendChild(quizOverSection);
 }
 
 function init() {
 	buildTheHeader();
 	buildMainSection();
 	body.appendChild(header);
-	body.appendChild(mainSection);
+	body.appendChild(mainSectionGrid);
 	body.appendChild(footer);
 }
 
 startButton.addEventListener('click', startQuiz);
 
+function startTimer() {
+	let timerSpanEl = document.getElementById('timer-span');
+	timerInterval = setInterval(function () {
+		startingTime--;
+		timerSpanEl.innerHTML = startingTime;
+		if (startingTime == 0) {
+			stopQuiz();
+		}
+	}, 1000);
+}
+
 function startQuiz() {
+	document.getElementById('start-button').remove();
 	quizPosition = 0;
-	startButton.setAttribute('class', 'hidden');
+	startingTime = 60;
+	document.getElementById('timer-span').innerHTML = startingTime;
+	startTimer();
 	displayQuestion(quizPosition);
 }
 
@@ -172,22 +238,30 @@ function advanceQuestion() {
 
 function stopQuiz() {
 	console.log('The quiz has stopped.');
+	clearInterval(timerInterval);
 	quizPosition = 0;
+	console.log(mainSection);
+	while (mainSection.firstChild) {
+		mainSection.firstChild.remove();
+	}
+	mainSection.appendChild(startButton);
+	displayScore();
 }
 
 mainSection.addEventListener('click', function (event) {
 	let element = event.target;
-	console.log(element);
 	if (element.dataset.correct == 'true') {
-		console.log('This is the right answer.');
+		element.setAttribute('style', 'background: lightblue');
 		answerResponseH2.innerHTML = 'Correct!';
-		questionSection.firstChild.appendChild(answerResponse);
-		const timeout = setTimeout(advanceQuestion, 200);
+		mainSection.appendChild(answerResponse);
+		let removal = document.getElementById('answer-response');
+		const timeout1 = setTimeout(advanceQuestion, 200);
 	} else if (element.dataset.correct == 'false') {
-		console.log('This is the wrong answer.');
+		element.setAttribute('class', 'wrong');
 		answerResponseH2.innerHTML = 'Wrong!';
-		questionSection.firstChild.appendChild(answerResponse);
-		const timeout = setTimeout(advanceQuestion, 200);
+		startingTime -= 15;
+		mainSection.appendChild(answerResponse);
+		const timeout1 = setTimeout(advanceQuestion, 200);
 	}
 });
 
