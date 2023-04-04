@@ -124,14 +124,14 @@ const quizQuestionsStaticLibrary = [
 ];
 
 // Helper function to randomize arrays
-function randomizeArray(questionArr) {
+function randomizeArray(arr) {
   let sourceArray = [];
   let returnArray = [];
 
   // Clone the array into a new array
   // I couldn't find an out-of-the-box method for doing this... Seems odd.
-  for (let i = 0; i < questionArr.length; i++) {
-    sourceArray.push(questionArr[i]);
+  for (let i = 0; i < arr.length; i++) {
+    sourceArray.push(arr[i]);
   }
 
   // Pull a random element out of one array and feed it to the other
